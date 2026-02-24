@@ -1,108 +1,106 @@
-# X-RPC Framework
+# X-RPC 框架
 
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://www.oracle.com/java/)
 [![Netty](https://img.shields.io/badge/Netty-4.1.117-blue)](https://netty.io/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-[中文](README.zh-CN.md) | English
+[English](README.md) | 中文 
 
-X-RPC is a high-performance, lightweight RPC (Remote Procedure Call) framework built on Netty, designed for microservices architecture. It provides service governance features including service registration and discovery, load balancing, rate limiting, circuit breaking, and more.
+X-RPC 是一个高性能、轻量级的 RPC（远程过程调用）框架，基于 Netty 构建，专为微服务架构设计。提供服务注册与发现、负载均衡、限流、熔断等服务治理功能。
 
-## 📋 Table of Contents
+## 📋 目录
 
-- [Core Features](#core-features)
-- [Architecture Design](#architecture-design)
-- [Quick Start](#quick-start)
-- [Detailed Usage Guide](#detailed-usage-guide)
-- [Configuration Manual](#configuration-manual)
-- [Module Structure](#module-structure)
-- [Example Code](#example-code)
-- [Tech Stack](#tech-stack)
-- [Roadmap](#roadmap)
-- [Contributing Guide](#contributing-guide)
-- [License](#license)
+- [核心特性](#核心特性)
+- [架构设计](#架构设计)
+- [快速开始](#快速开始)
+- [详细使用指南](#详细使用指南)
+- [配置手册](#配置手册)
+- [模块结构](#模块结构)
+- [示例代码](#示例代码)
+- [技术栈](#技术栈)
+- [路线图](#路线图)
+- [贡献指南](#贡献指南)
+- [许可证](#许可证)
 
-## ✨ Core Features
+## ✨ 核心特性
 
-### 🎯 Service Governance
+### 🎯 服务治理
 
-- **Service Registration and Discovery**: Built-in ZooKeeper support for service registration and discovery
-- **Load Balancing**: Support for random and round-robin load balancing strategies
-- **Rate Limiting**: Token bucket algorithm for traffic control
-- **Circuit Breaking**: Sliding window algorithm for fault tolerance
-- **Logging**: Request/response logging and tracing
+- **服务注册与发现**：内置 ZooKeeper 支持服务注册和发现
+- **负载均衡**：支持随机和轮询负载均衡策略
+- **限流**：令牌桶算法进行流量控制
+- **熔断**：滑动窗口算法实现故障容错
+- **日志**：请求/响应日志记录和追踪
 
-### 🔧 Technical Features
+### 🔧 技术特性
 
-- **High Performance**: Asynchronous non-blocking I/O based on Netty
-- **Pluggable Architecture**: SPI extension mechanism for easy customization
-- **Multiple Invocation Methods**: Support for manual API calls and annotation-driven injection
-- **Flexible Configuration**: YAML format configuration for easy management
-- **Kryo Serialization**: High-performance serialization for more efficient data transfer
+- **高性能**：基于 Netty 实现异步非阻塞 I/O
+- **可插拔架构**：SPI 扩展机制，易于定制
+- **多种调用方式**：支持手动 API 调用和注解驱动注入
+- **灵活配置**：YAML 格式配置，易于管理
+- **Kryo 序列化**：高性能序列化，数据传输更高效
 
-### 🏗️ Architecture Design
+### 🏗️ 架构设计
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Application Layer                     │
+│                        应用层                                │
 │  ┌──────────────┐          ┌──────────────┐                │
-│  │   Service    │          │   Service    │                │
-│  │   Consumer   │          │   Provider   │                │
-│  │ @RpcReference│          │  @RpcService │                │
+│  │   服务消费者  │          │   服务提供者  │                │
+│  │ @RpcReference│          │  @RpcService  │                │
 │  └──────┬───────┘          └──────┬───────┘                │
 └─────────┼───────────────────────────┼────────────────────────┘
           │                           │
 ┌─────────▼───────────────────────────▼────────────────────────┐
-│                      Framework Core Layer                   │
+│                      框架核心层                               │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │   Proxy  │  │   Chain  │  │  Config  │  │   SPI    │   │
-│  │  Factory │─▶│ (Chain)  │─▶│  Loader  │─▶│  Loader  │   │
+│  │  代理工厂 │  │ 调用链   │  │ 配置加载 │  │  SPI扩展 │   │
+│  │  (Proxy) │─▶│ (Chain)  │─▶│ (Config) │─▶│ (Loader) │   │
 │  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
 └───────┼───────────────┼───────────────┼───────────────┼──────┘
         │               │               │               │
 ┌───────▼───────────────▼───────────────▼───────────────▼──────┐
-│                    Infrastructure Layer                     │
+│                      基础设施层                              │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │ Network  │  │ Registry │  │   Ser-   │  │  Load    │   │
-│  │ Transport│  │  Center  │  │ ializer  │  │ Balancer │   │
-│  │ (Netty)  │  │(ZooKeeper)│  │  (Kryo)  │  │(Random/  │   │
-│  └──────────┘  └──────────┘  └──────────┘  │ Round-   │   │
-│                                             │ robin)   │   │
-│ Note: xrpc-all and xrpc-bom are management  └──────────┘   │
-│       modules for simplified dependency management         │
+│  │ 网络传输  │  │ 注册中心  │  │ 序列化   │  │ 负载均衡  │  │
+│  │ (Netty)  │  │(ZooKeeper)│  │  (Kryo)  │  │(随机/轮询)│  │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
+│                                                             │
+│  注：xrpc-all 和 xrpc-bom 是管理模块，用于简化依赖管理     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
-### Requirements
+### 环境要求
 
-- JDK 17 or higher
+- JDK 17 或更高版本
 - Maven 3.6+
-- ZooKeeper 3.5+ (required for service registration and discovery)
+- ZooKeeper 3.5+（服务注册和发现必需）
 
-**About ZooKeeper**: Currently X-RPC requires an external ZooKeeper instance for service registration. We plan to introduce a built-in local registry center in future versions to simplify deployment.
+**关于 ZooKeeper**：目前 X-RPC 需要外部 ZooKeeper 实例进行服务注册。我们计划在未来版本中引入内置的本地注册中心，以简化部署。
 
-### Installation Steps
+### 安装步骤
 
-1. Clone the repository:
+1. 克隆仓库：
 
 ```bash
 git clone https://github.com/x-kill9/xrpc-framework.git
 cd xrpc-framework
 ```
 
-2. Build the project:
+2. 构建项目：
 
 ```bash
 mvn clean install
 ```
 
-3. Add dependencies to your project (choose one of the following methods):
+3. 在项目中添加依赖（选择以下方式之一）：
 
-**Method A: Using BOM for dependency management (recommended)**
+**方式 A：使用 BOM 进行依赖管理（推荐）**
 
 ```xml
+
 <dependencyManagement>
     <dependencies>
         <dependency>
@@ -114,19 +112,20 @@ mvn clean install
         </dependency>
     </dependencies>
 </dependencyManagement>
-
-<!-- Then add specific modules without specifying version -->
+        
+<!-- 然后添加具体模块，无需指定版本 -->
 <dependencies>
-    <dependency>
-        <groupId>io.github.x-kill9</groupId>
-        <artifactId>xrpc-core</artifactId>
-    </dependency>
+<dependency>
+    <groupId>io.github.x-kill9</groupId>
+    <artifactId>xrpc-core</artifactId>
+</dependency>
 </dependencies>
 ```
 
-**Method B: Using aggregate module**
+**方式 B：使用聚合模块**
 
 ```xml
+
 <dependency>
     <groupId>io.github.x-kill9</groupId>
     <artifactId>xrpc-all</artifactId>
@@ -134,9 +133,10 @@ mvn clean install
 </dependency>
 ```
 
-**Method C: Add individual modules**
+**方式 C：添加单个模块**
 
 ```xml
+
 <dependency>
     <groupId>io.github.x-kill9</groupId>
     <artifactId>xrpc-core</artifactId>
@@ -144,9 +144,9 @@ mvn clean install
 </dependency>
 ```
 
-### Basic Usage
+### 基本使用
 
-#### 1. Define Service Interface
+#### 1. 定义服务接口
 
 ```java
 public interface HelloService {
@@ -154,19 +154,20 @@ public interface HelloService {
 }
 ```
 
-#### 2. Implement Service Provider
+#### 2. 实现服务提供者
 
 ```java
+
 @RpcService
 public class HelloServiceImpl implements HelloService {
     @Override
     public String sayHello(String name) {
-        return "Hello, " + name + "!";
+        return "你好, " + name + "!";
     }
 }
 ```
 
-#### 3. Configure Provider (xrpc.yaml)
+#### 3. 配置提供者 (xrpc.yaml)
 
 ```yaml
 xrpc:
@@ -177,27 +178,27 @@ xrpc:
     address: 127.0.0.1:2181
 ```
 
-#### 4. Start Provider
+#### 4. 启动提供者
 
 ```java
 public class ProviderApplication {
     public static void main(String[] args) {
-        // Auto-register services via @RpcService annotation - xrpc-annotation module required
+        // 通过 @RpcService 注解自动注册服务-必须引入xrpc-annotation模块
         RpcContainer container = RpcContainer.getInstance();
         Map<String, Object> serviceMap = RpcServiceExporter.getExportedServices(container);
-        
-        // Or manually register services
+
+        // 或手动注册服务
         container.registerBean(CalculatorImpl.class, calculator, "calculator");
         container.registerBean(HelloServiceImpl.class, helloService, "helloService");
         Map<String, Object> serviceMap = ServiceMapBuilder.buildFromContainer(container);
-        
+
         NettyServer server = new NettyServer("127.0.0.1", 8080, serviceMap);
         server.start();
     }
 }
 ```
 
-#### 5. Configure Consumer (xrpc.yaml)
+#### 5. 配置消费者 (xrpc.yaml)
 
 ```yaml
 xrpc:
@@ -206,21 +207,21 @@ xrpc:
     loadBalancer: round
     connectTimeout: 3000
     callTimeout: 3000
-    
+
     interceptors:
       - name: trace
         properties:
           level: INFO
           logArgs: true
           logResult: true
-      
+
       - name: rateLimiter
         properties:
           type: tokenBucket
           params:
             capacity: 200
             refillRate: 20
-      
+
       - name: circuitBreaker
         properties:
           type: slidingWindow
@@ -228,13 +229,13 @@ xrpc:
             failureThreshold: 5
             timeoutMs: 10000
             windowSize: 10000
-            
+
   registry:
     type: zookeeper
     address: 127.0.0.1:2181
 ```
 
-#### 6. Use Service in Consumer
+#### 6. 在消费者中使用服务
 
 ```java
 public class ConsumerApplication {
@@ -242,90 +243,100 @@ public class ConsumerApplication {
         final String transport = ConfigFactory.getConfig().getClient().getTransport();
         RpcClient client = ExtensionLoader.getExtensionLoader(RpcClient.class)
                 .getExtension(transport);
-        
+
         JdkProxyFactory proxyFactory = new JdkProxyFactory(client);
         HelloService helloService = proxyFactory.getProxy(HelloService.class);
-        
-        String result = helloService.sayHello("World");
-        System.out.println(result); // Output: Hello, World!
+
+        String result = helloService.sayHello("世界");
+        System.out.println(result); // 输出: 你好, 世界!
     }
 }
 ```
 
-## 📖 Detailed Usage Guide
+## 📖 详细使用指南
 
-### Service Registration and Discovery
+### 服务注册与发现
 
-#### Using Annotations (Recommended)
+#### 使用注解（推荐）
 
-**Service Provider:**
+**服务提供者：**
 
 ```java
+
 @RpcService
 public class UserServiceImpl implements UserService {
-    // Implementation methods
+    // 实现方法
 }
 ```
 
-**Service Consumer:**
+**服务消费者：**
 
 ```java
 public class OrderService {
     @RpcReference
     private UserService userService;
-    
+
     public void createOrder() {
         User user = userService.getUserById(123L);
-        // Business logic
+        // 业务逻辑
     }
 }
 ```
 
-#### Manual Registration
+#### 手动注册
 
 ```java
-// Register service
+// 注册服务
 RpcContainer container = RpcContainer.getInstance();
-container.registerBean(CalculatorImpl.class, new CalculatorImpl(), "calculator");
+container.
 
-// Build service map
+registerBean(CalculatorImpl .class, new CalculatorImpl(), "calculator");
+
+// 构建服务映射
 Map<String, Object> serviceMap = new HashMap<>();
-serviceMap.put(CalculatorService.class.getName(), new CalculatorImpl());
+serviceMap.
 
-// Start server
+put(CalculatorService .class.getName(), new
+
+CalculatorImpl());
+
+// 启动服务器
 NettyServer server = new NettyServer("127.0.0.1", 8081, serviceMap);
-server.start();
+server.
+
+start();
 ```
 
-### Load Balancing
+### 负载均衡
 
-Configure load balancing strategy in `xrpc.yaml`:
+在 `xrpc.yaml` 中配置负载均衡策略：
 
 ```yaml
 xrpc:
   client:
-    loadBalancer: round  # Options: random (random), round (round-robin)
+    loadBalancer: round  # 选项: random（随机）, round（轮询）
 ```
 
-Or get from configuration via code:
+或通过代码从配置中获取：
 
 ```java
-// Get load balancer type name from configuration
+// 从配置中获取负载均衡策略名称
 String loadBalancerType = ConfigFactory.getConfig().getClient().getLoadBalancer();
 
-// Get load balancer instance via SPI
+// 通过 SPI 获取负载均衡器实例
 LoadBalancer loadBalancer = ExtensionLoader.getExtensionLoader(LoadBalancer.class)
         .getExtension(loadBalancerType);
 
-// Select service instance
+// 选择服务实例
 ServiceMeta selectedService = loadBalancer.select(serviceMetas);
 ```
 
-**Custom Load Balancer**: You can develop your own load balancing algorithm by implementing the `LoadBalancer` interface and registering it with SPI. Refer to the [SPI Extension Interfaces](#spi-extension-interfaces) section for more extension points.
+**自定义负载均衡器**：您可以通过实现 `LoadBalancer` 接口并注册到 SPI
+来开发自己的负载均衡算法。参考 [SPI 扩展接口](#spi-扩展接口) 章节了解更多可扩展点。
 
-### Rate Limiting
+### 限流
 
-Configure rate limiter in `xrpc.yaml`:
+在 `xrpc.yaml` 中配置限流器：
 
 ```yaml
 xrpc:
@@ -335,13 +346,13 @@ xrpc:
         properties:
           type: tokenBucket
           params:
-            capacity: 200      # Maximum token bucket capacity
-            refillRate: 20     # Refill rate per second
+            capacity: 200      # 令牌桶最大容量
+            refillRate: 20     # 每秒填充速率
 ```
 
-### Circuit Breaking
+### 熔断
 
-Configure circuit breaker in `xrpc.yaml`:
+在 `xrpc.yaml` 中配置熔断器：
 
 ```yaml
 xrpc:
@@ -351,67 +362,67 @@ xrpc:
         properties:
           type: slidingWindow
           params:
-            failureThreshold: 5    # Open circuit after 5 failures
-            timeoutMs: 10000       # Try half-open state after 10 seconds
-            windowSize: 10000      # Sliding window size (milliseconds)
+            failureThreshold: 5    # 失败5次后打开熔断器
+            timeoutMs: 10000       # 10秒后尝试半开状态
+            windowSize: 10000      # 滑动窗口大小（毫秒）
 ```
 
-### Custom Interceptor
+### 自定义拦截器
 
-Implement the `Interceptor` interface:
+实现 `Interceptor` 接口：
 
 ```java
 public class CustomInterceptor implements Interceptor<InterceptorConfig> {
     private InterceptorConfig config;
-    
+
     @Override
     public String getName() {
         return "custom";
     }
-    
+
     @Override
     public Class<InterceptorConfig> getConfigClass() {
         return InterceptorConfig.class;
     }
-    
+
     @Override
     public void setConfig(InterceptorConfig config) {
         this.config = config;
     }
-    
+
     @Override
     public InterceptorConfig getConfig() {
         return config;
     }
-    
+
     @Override
     public Object intercept(InvocationContext context, InterceptorChain chain) throws Throwable {
-        // Pre-processing logic
-        logger.info("Before request: {}", context.getRequest().getMethodName());
-        
+        // 前置处理逻辑
+        logger.info("请求前: {}", context.getRequest().getMethodName());
+
         try {
-            // Continue interceptor chain execution
+            // 继续执行拦截器链
             Object result = chain.proceed(context);
-            
-            // Post-processing logic
-            logger.info("After request: {}", result);
+
+            // 后置处理逻辑
+            logger.info("请求后: {}", result);
             return result;
         } catch (Exception e) {
-            // Exception handling logic
-            logger.error("Request exception: {}", e.getMessage());
+            // 异常处理逻辑
+            logger.error("请求异常: {}", e.getMessage());
             throw e;
         }
     }
 }
 ```
 
-Register in `META-INF/xrpc/io.github.x_kill9.xrpc.core.invocation.interceptor.Interceptor`:
+在 `META-INF/xrpc/io.github.x_kill9.xrpc.core.invocation.interceptor.Interceptor` 中注册：
 
 ```properties
 custom=com.example.CustomInterceptor
 ```
 
-Configure in `xrpc.yaml`:
+在 `xrpc.yaml` 中配置：
 
 ```yaml
 xrpc:
@@ -420,65 +431,66 @@ xrpc:
       - name: custom
 ```
 
-### SPI Extension Interfaces
+### SPI 扩展接口
 
-The X-RPC framework provides powerful extension capabilities based on the SPI (Service Provider Interface) mechanism. You can extend framework functionality by implementing the following interfaces and registering them in the `META-INF/xrpc/` directory:
+X-RPC 框架基于 SPI（Service Provider Interface）机制提供强大的扩展能力。您可以通过实现以下接口并注册到 `META-INF/xrpc/`
+目录来扩展框架功能：
 
-#### Extensible Interfaces List
+#### 可扩展接口列表
 
-| Interface | Description | Configuration File Path |
-|-----------|-------------|------------------------|
-| `io.github.x_kill9.xrpc.core.loadbalance.LoadBalancer` | Load balancing strategy | `META-INF/xrpc/io.github.x_kill9.xrpc.core.loadbalance.LoadBalancer` |
-| `io.github.x_kill9.xrpc.core.serialize.Serializer` | Serialization method | `META-INF/xrpc/io.github.x_kill9.xrpc.core.serialize.Serializer` |
-| `io.github.x_kill9.xrpc.core.registry.RegistryService` | Registry center | `META-INF/xrpc/io.github.x_kill9.xrpc.core.registry.RegistryService` |
-| `io.github.x_kill9.xrpc.core.transport.RpcClient` | RPC client | `META-INF/xrpc/io.github.x_kill9.xrpc.core.transport.RpcClient` |
-| `io.github.x_kill9.xrpc.core.circuitbreaker.CircuitBreaker` | Circuit breaker | `META-INF/xrpc/io.github.x_kill9.xrpc.core.circuitbreaker.CircuitBreaker` |
-| `io.github.x_kill9.xrpc.core.flowcontrol.RateLimiter` | Rate limiter | `META-INF/xrpc/io.github.x_kill9.xrpc.core.flowcontrol.RateLimiter` |
-| `io.github.x_kill9.xrpc.core.invocation.interceptor.Interceptor` | Interceptor | `META-INF/xrpc/io.github.x_kill9.xrpc.core.invocation.interceptor.Interceptor` |
-| `io.github.x_kill9.xrpc.core.config.loader.ConfigLoader` | Configuration loader | `META-INF/xrpc/io.github.x_kill9.xrpc.core.config.loader.ConfigLoader` |
+| 接口                                                               | 说明      | 配置文件路径                                                                         |
+|------------------------------------------------------------------|---------|--------------------------------------------------------------------------------|
+| `io.github.x_kill9.xrpc.core.loadbalance.LoadBalancer`           | 负载均衡策略  | `META-INF/xrpc/io.github.x_kill9.xrpc.core.loadbalance.LoadBalancer`           |
+| `io.github.x_kill9.xrpc.core.serialize.Serializer`               | 序列化方式   | `META-INF/xrpc/io.github.x_kill9.xrpc.core.serialize.Serializer`               |
+| `io.github.x_kill9.xrpc.core.registry.RegistryService`           | 注册中心    | `META-INF/xrpc/io.github.x_kill9.xrpc.core.registry.RegistryService`           |
+| `io.github.x_kill9.xrpc.core.transport.RpcClient`                | RPC 客户端 | `META-INF/xrpc/io.github.x_kill9.xrpc.core.transport.RpcClient`                |
+| `io.github.x_kill9.xrpc.core.circuitbreaker.CircuitBreaker`      | 熔断器     | `META-INF/xrpc/io.github.x_kill9.xrpc.core.circuitbreaker.CircuitBreaker`      |
+| `io.github.x_kill9.xrpc.core.flowcontrol.RateLimiter`            | 限流器     | `META-INF/xrpc/io.github.x_kill9.xrpc.core.flowcontrol.RateLimiter`            |
+| `io.github.x_kill9.xrpc.core.invocation.interceptor.Interceptor` | 拦截器     | `META-INF/xrpc/io.github.x_kill9.xrpc.core.invocation.interceptor.Interceptor` |
+| `io.github.x_kill9.xrpc.core.config.loader.ConfigLoader`         | 配置加载器   | `META-INF/xrpc/io.github.x_kill9.xrpc.core.config.loader.ConfigLoader`         |
 
-#### SPI Registration Example
+#### SPI 注册示例
 
-Create corresponding interface files in `src/main/resources/META-INF/xrpc/` directory with format:
+在 `src/main/resources/META-INF/xrpc/` 目录下创建对应接口的文件，内容格式为：
 
 ```properties
-# name=fully-qualified implementation class name
+# 名称=实现类全限定名
 myCustomImpl=com.example.MyCustomImplementation
 ```
 
-Then reference by name in configuration file:
+然后在配置文件中通过名称引用：
 
 ```yaml
 xrpc:
   client:
-    loadBalancer: myCustomImpl  # Use custom load balancer
+    loadBalancer: myCustomImpl  # 使用自定义的负载均衡器
 ```
 
-#### Extension Example: Custom Serialization
+#### 扩展示例：自定义序列化
 
 ```java
 public class JsonSerializer implements Serializer {
     @Override
     public byte[] serialize(Object obj) throws Exception {
-        // JSON serialization implementation
+        // JSON 序列化实现
         return jsonString.getBytes();
     }
-    
+
     @Override
     public <T> T deserialize(byte[] bytes, Class<T> clazz) throws Exception {
-        // JSON deserialization implementation
+        // JSON 反序列化实现
         return jsonObject;
     }
 }
 ```
 
-Register in `META-INF/xrpc/io.github.x_kill9.xrpc.core.serialize.Serializer`:
+在 `META-INF/xrpc/io.github.x_kill9.xrpc.core.serialize.Serializer` 中注册：
 
 ```properties
 json=com.example.JsonSerializer
 ```
 
-Use in configuration:
+在配置中使用：
 
 ```yaml
 xrpc:
@@ -486,36 +498,36 @@ xrpc:
     serializer: json
 ```
 
-## ⚙️ Configuration Manual
+## ⚙️ 配置手册
 
-### Client Configuration
+### 客户端配置
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `serializer` | String | kryo | Serialization method (currently supports kryo) |
-| `loadBalancer` | String | random | Load balancing strategy (random/round) |
-| `connectTimeout` | Integer | 3000 | Connection timeout (milliseconds) |
-| `callTimeout` | Integer | 3000 | Call timeout (milliseconds) |
-| `heartbeatIntervalSeconds` | Integer | 60 | Heartbeat interval (seconds) |
-| `interceptors` | List | [] | Interceptor chain configuration |
+| 参数                         | 类型      | 默认值    | 说明                   |
+|----------------------------|---------|--------|----------------------|
+| `serializer`               | String  | kryo   | 序列化方式（目前支持 kryo）     |
+| `loadBalancer`             | String  | random | 负载均衡策略（random/round） |
+| `connectTimeout`           | Integer | 3000   | 连接超时时间（毫秒）           |
+| `callTimeout`              | Integer | 3000   | 调用超时时间（毫秒）           |
+| `heartbeatIntervalSeconds` | Integer | 60     | 心跳间隔（秒）              |
+| `interceptors`             | List    | []     | 拦截器链配置               |
 
-### Server Configuration
+### 服务端配置
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `port` | Integer | 8080 | Service port |
-| `bossThreads` | Integer | 1 | Netty boss thread count |
-| `workerThreads` | Integer | 4 | Netty worker thread count |
+| 参数              | 类型      | 默认值  | 说明               |
+|-----------------|---------|------|------------------|
+| `port`          | Integer | 8080 | 服务端口             |
+| `bossThreads`   | Integer | 1    | Netty boss 线程数   |
+| `workerThreads` | Integer | 4    | Netty worker 线程数 |
 
-### Registry Configuration
+### 注册中心配置
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `type` | String | zookeeper | Registry type (zookeeper/local) |
-| `address` | String | - | Registry address (host:port) |
-| `timeout` | Integer | 3000 | Connection timeout (milliseconds) |
+| 参数        | 类型      | 默认值       | 说明                      |
+|-----------|---------|-----------|-------------------------|
+| `type`    | String  | zookeeper | 注册中心类型（zookeeper/local） |
+| `address` | String  | -         | 注册中心地址（host:port）       |
+| `timeout` | Integer | 3000      | 连接超时时间（毫秒）              |
 
-### Complete Configuration Example
+### 完整配置示例
 
 ```yaml
 xrpc:
@@ -525,21 +537,21 @@ xrpc:
     connectTimeout: 3000
     callTimeout: 3000
     heartbeatIntervalSeconds: 60
-    
+
     interceptors:
       - name: trace
         properties:
           level: INFO
           logArgs: true
           logResult: true
-      
+
       - name: rateLimiter
         properties:
           type: tokenBucket
           params:
             capacity: 200
             refillRate: 20
-      
+
       - name: circuitBreaker
         properties:
           type: slidingWindow
@@ -547,326 +559,327 @@ xrpc:
             failureThreshold: 5
             timeoutMs: 10000
             windowSize: 10000
-            
+
   server:
     port: 8080
     bossThreads: 1
     workerThreads: 4
-    
+
   registry:
     type: zookeeper
     address: 127.0.0.1:2181
     timeout: 3000
 ```
 
-## 📦 Module Structure
+## 📦 模块结构
 
-### Management Modules
+### 管理模块
 
 #### xrpc-all
 
-Aggregate module containing all X-RPC modules. Use this module when you need the complete framework.
+聚合模块，包含所有 X-RPC 模块。当需要完整框架时使用此模块。
 
 #### xrpc-bom
 
-BOM (Bill of Materials) module for dependency management. Import this module in your project's dependency management to ensure consistent versions across all X-RPC modules.
+BOM（物料清单）模块，用于依赖管理。在项目的 dependency management 中导入此模块，可确保所有 X-RPC 模块版本一致。
 
-### Core Modules
+### 核心模块
 
 #### xrpc-core
 
-Core module containing all basic interfaces and abstractions.
+核心模块，包含所有基础接口和抽象。
 
-- **Key Classes**:
-  - `RpcClient` - RPC client interface
-  - `RpcServer` - RPC server interface
-  - `ExtensionLoader` - SPI extension loader
-  - `JdkProxyFactory` - JDK dynamic proxy factory
-  - `Request` / `Response` - RPC message model
-  - `XrpcConfig` - Configuration model
+- **关键类**：
+    - `RpcClient` - RPC 客户端接口
+    - `RpcServer` - RPC 服务端接口
+    - `ExtensionLoader` - SPI 扩展加载器
+    - `JdkProxyFactory` - JDK 动态代理工厂
+    - `Request` / `Response` - RPC 消息模型
+    - `XrpcConfig` - 配置模型
 
 #### xrpc-netty
 
-Network transport module based on Netty.
+网络传输模块，基于 Netty 实现。
 
-- **Key Classes**:
-  - `NettyClient` - Netty-based RPC client implementation
-  - `NettyServer` - Netty-based RPC server implementation
-  - `RpcClientHandler` - Client message handler
-  - `RpcServerHandler` - Server message handler
+- **关键类**：
+    - `NettyClient` - 基于 Netty 的 RPC 客户端实现
+    - `NettyServer` - 基于 Netty 的 RPC 服务端实现
+    - `RpcClientHandler` - 客户端消息处理器
+    - `RpcServerHandler` - 服务端消息处理器
 
 #### xrpc-registry
 
-Service registration and discovery module.
+服务注册与发现模块。
 
-**xrpc-registry-zookeeper**:
+**xrpc-registry-zookeeper**：
 
-- `ZookeeperRegistry` - ZooKeeper-based service registry
-- Supports ephemeral nodes with automatic service deregistration on shutdown
-- Listens for service changes
-- **Note**: Currently requires external ZooKeeper deployment. Future versions will include a built-in local registry to eliminate this dependency.
+- `ZookeeperRegistry` - 基于 ZooKeeper 的服务注册中心
+- 支持临时节点，服务下线自动注销
+- 监听服务变化
+- **注意**：目前需要外部部署 ZooKeeper。未来版本将内置本地注册中心，消除此依赖。
 
-**xrpc-registry-local**:
+**xrpc-registry-local**：
 
-- `LocalRegistry` - In-memory service registry for testing (not yet implemented)
+- `LocalRegistry` - 内存服务注册中心，用于测试（暂未实现）
 
 #### xrpc-serializer
 
-Serialization module using Kryo.
+序列化模块，使用 Kryo。
 
-- `KryoSerializer` - High-performance serialization based on Kryo
-- Thread-safe Kryo instance pool
+- `KryoSerializer` - 基于 Kryo 的高性能序列化
+- 线程安全的 Kryo 实例池
 
 #### xrpc-loadbalance
 
-Load balancing module.
+负载均衡模块。
 
-- `RandomLoadBalancer` - Random load balancing
-- `RoundRobinLoadBalancer` - Round-robin load balancing
+- `RandomLoadBalancer` - 随机负载均衡
+- `RoundRobinLoadBalancer` - 轮询负载均衡
 
 #### xrpc-ratelimiter
 
-Rate limiting module.
+限流模块。
 
-- `TokenBucketRateLimiter` - Token bucket algorithm implementation
+- `TokenBucketRateLimiter` - 令牌桶算法实现
 
 #### xrpc-circuitbreaker
 
-Circuit breaker module.
+熔断器模块。
 
-- `SlidingWindowCircuitBreaker` - Sliding window algorithm implementation
+- `SlidingWindowCircuitBreaker` - 滑动窗口算法实现
 
 #### xrpc-config
 
-Configuration module.
+配置模块。
 
-**xrpc-config-yaml**:
+**xrpc-config-yaml**：
 
-- `YamlConfigLoader` - YAML configuration file loader
-- Supports complex nested configurations
+- `YamlConfigLoader` - YAML 配置文件加载器
+- 支持复杂的嵌套配置
 
 #### xrpc-logging
 
-Logging interceptor module.
+日志拦截器模块。
 
-- `TraceInterceptor` - Request/response logging and tracing
+- `TraceInterceptor` - 请求/响应日志记录和追踪
 
 #### xrpc-annotation
 
-Annotation definition module.
+注解定义模块。
 
-- `@RpcService` - Marks RPC service provider
-- `@RpcReference` - Injects RPC service proxy
+- `@RpcService` - 标记 RPC 服务提供者
+- `@RpcReference` - 注入 RPC 服务代理
 
-### Example Modules
+### 示例模块
 
 #### xrpc-example-api
 
-Shared API interfaces.
+共享 API 接口。
 
-- `HelloService` - Simple greeting service
-- `CalculatorService` - Calculator service with arithmetic operations
+- `HelloService` - 简单的问候服务
+- `CalculatorService` - 计算器服务，包含四则运算
 
 #### xrpc-example-provider
 
-Service provider implementation.
+服务提供者实现。
 
-- `HelloServiceImpl` - Hello service implementation
-- `CalculatorImpl` - Calculator service implementation
-- `ManualServerExample` - Manual server startup example
+- `HelloServiceImpl` - Hello 服务实现
+- `CalculatorImpl` - 计算器服务实现
+- `ManualServerExample` - 手动启动服务端示例
 
 #### xrpc-example-consumer
 
-Service consumer implementation.
+服务消费者实现。
 
-- `ManualClientExample` - Manual client usage example
+- `ManualClientExample` - 手动使用客户端示例
 
-## 💻 Example Code
+## 💻 示例代码
 
-### Running Examples
+### 运行示例
 
-**Important**: X-RPC currently requires ZooKeeper for service registration and discovery. Please ensure ZooKeeper is deployed and running before starting the examples.
+**重要**：X-RPC 目前需要 ZooKeeper 进行服务注册和发现。请在启动示例前确保 ZooKeeper 已部署并运行。
 
-1. Start ZooKeeper:
+1. 启动 ZooKeeper：
 
 ```bash
-# Default port 2181
+# 默认端口 2181
 zkServer.sh start
 ```
 
-2. Start provider: io.github.x_kill9.xrpc.provider.ServerManualExample
+2. 启动提供者： io.github.x_kill9.xrpc.provider.ServerManualExample
 
-3. Run consumer: io.github.x_kill9.xrpc.consumer.ClientManualExample
+3. 运行消费者：io.github.x_kill9.xrpc.consumer.ClientManualExample
 
-### Manual API Example
+### 手动 API 示例
 
 ```java
-// Server side
+// 服务端
 public class ServerDemo {
     public static void main(String[] args) throws Exception {
-        // 1. Create service instances
+        // 1. 创建服务实例
         CalculatorService calculator = new CalculatorImpl();
         HelloService helloService = new HelloServiceImpl();
-        
-        // 2. Register to container
+
+        // 2. 注册到容器
         RpcContainer container = RpcContainer.getInstance();
         container.registerBean(CalculatorImpl.class, calculator, "calculator");
         container.registerBean(HelloServiceImpl.class, helloService, "helloService");
-        
-        // 3. Build service map
+
+        // 3. 构建服务映射
         Map<String, Object> serviceMap = new HashMap<>();
         serviceMap.put(CalculatorService.class.getName(), calculator);
         serviceMap.put(HelloService.class.getName(), helloService);
-        
-        // 4. Start Netty server
+
+        // 4. 启动 Netty 服务器
         NettyServer server = new NettyServer("127.0.0.1", 8081, serviceMap);
         server.start();
     }
 }
 
-// Client side
+// 客户端
 public class ClientDemo {
     public static void main(String[] args) throws Exception {
-        // 1. Get transport type from configuration
+        // 1. 从配置获取传输类型
         final String transport = ConfigFactory.getConfig().getClient().getTransport();
-        
-        // 2. Create RPC client via SPI
+
+        // 2. 通过 SPI 创建 RPC 客户端
         RpcClient client = ExtensionLoader.getExtensionLoader(RpcClient.class)
                 .getExtension(transport);
-        
-        // 3. Create JDK proxy factory
+
+        // 3. 创建 JDK 代理工厂
         final JdkProxyFactory proxyFactory = new JdkProxyFactory(client);
-        
-        // 4. Get service proxy
+
+        // 4. 获取服务代理
         final CalculatorService calculator = proxyFactory.getProxy(CalculatorService.class);
-        
-        // 5. Make RPC call
+
+        // 5. 发起 RPC 调用
         int result = calculator.multiply(11, 20);
-        logger.info("Result of 11 * 20 = {}", result);
+        logger.info("11 * 20 的结果是: {}", result);
     }
 }
 ```
 
-### Advanced Configuration Example
+### 高级配置示例
 
-**Custom Load Balancer**: Implement the `LoadBalancer` interface to develop custom algorithms (e.g., consistent hashing), then register in `META-INF/xrpc/io.github.x_kill9.xrpc.core.loadbalance.LoadBalancer`:
+**自定义负载均衡器**：实现 `LoadBalancer` 接口开发自定义算法（如一致性哈希），
+然后在 `META-INF/xrpc/io.github.x_kill9.xrpc.core.loadbalance.LoadBalancer` 中注册：
 
 ```text
 consistentHash=com.example.ConsistentHashLoadBalancer
 ```
 
-Configuration usage:
+配置使用：
 ```yaml
 xrpc:
   client:
     loadBalancer: consistentHash
 ```
 
-## 🛠️ Tech Stack
+## 🛠️ 技术栈
 
-### Core Technologies
+### 核心技术
 
-- **Java 17** - Modern Java features and performance
-- **Netty 4.1.117.Final** - High-performance network application framework
-- **Kryo 5.6.2** - Fast and efficient serialization library
-- **ZooKeeper + Curator 5.9.0** - Distributed coordination and service discovery
-- **SnakeYAML 1.33** - YAML configuration parsing
-- **SLF4J + Logback** - Logging framework
-- **Reflections 0.10.2** - Runtime classpath scanning
+- **Java 17** - 现代 Java 特性和性能
+- **Netty 4.1.117.Final** - 高性能网络应用框架
+- **Kryo 5.6.2** - 快速高效的序列化库
+- **ZooKeeper + Curator 5.9.0** - 分布式协调和服务发现
+- **SnakeYAML 1.33** - YAML 配置解析
+- **SLF4J + Logback** - 日志框架
+- **Reflections 0.10.2** - 运行时类路径扫描
 
-### Build Tools
+### 构建工具
 
-- **Maven 3.6+** - Project build and dependency management
-- **JUnit 5** - Testing framework
+- **Maven 3.6+** - 项目构建和依赖管理
+- **JUnit 5** - 测试框架
 
-### Design Patterns
+### 设计模式
 
-- **SPI (Service Provider Interface)** - Pluggable extension mechanism
-- **Proxy Pattern** - JDK dynamic proxy for RPC calls
-- **Interceptor Chain** - Chain of responsibility for service governance
-- **Factory Pattern** - Component creation and configuration
-- **Singleton Pattern** - RPC container and extension loader
+- **SPI（服务提供者接口）** - 可插拔扩展机制
+- **代理模式** - JDK 动态代理实现 RPC 调用
+- **拦截器链** - 责任链模式实现服务治理
+- **工厂模式** - 组件创建和配置
+- **单例模式** - RPC 容器和扩展加载器
 
-## 🔮 Roadmap
+## 🔮 路线图
 
-### Version 1.1 (Planned)
+### 版本 1.1（计划中）
 
-- [ ] Support for multiple serialization formats (Protobuf, JSON)
-- [ ] Additional load balancing algorithms (consistent hashing, least connections)
-- [ ] Support for multiple registry centers (Nacos, Consul, Etcd)
-- [ ] Connection pool support
-- [ ] Async call support (CompletableFuture)
+- [ ] 支持多种序列化格式（Protobuf、JSON）
+- [ ] 增加负载均衡算法（一致性哈希、最少连接）
+- [ ] 支持多种注册中心（Nacos、Consul、Etcd）
+- [ ] 连接池支持
+- [ ] 异步调用支持（CompletableFuture）
 
-### Version 1.2 (Planned)
+### 版本 1.2（计划中）
 
-- [ ] HTTP/2 support
-- [ ] gRPC compatibility layer
-- [ ] Metrics and monitoring integration (Prometheus)
-- [ ] Distributed tracing integration (OpenTelemetry)
-- [ ] Security features (TLS/SSL, authentication)
+- [ ] HTTP/2 支持
+- [ ] gRPC 兼容层
+- [ ] 指标和监控集成（Prometheus）
+- [ ] 分布式追踪集成（OpenTelemetry）
+- [ ] 安全特性（TLS/SSL、认证）
 
-### Future Enhancements
+### 未来增强
 
-- [ ] IDL (Interface Definition Language) support
-- [ ] Code generation tools
+- [ ] IDL（接口定义语言）支持
+- [ ] 代码生成工具
 - [ ] Spring Boot Starter
-- [ ] Docker and Kubernetes deployment examples
-- [ ] Performance optimization (zero-copy, memory pool)
+- [ ] Docker 和 Kubernetes 部署示例
+- [ ] 性能优化（零拷贝、内存池）
 
-## 🤝 Contributing Guide
+## 🤝 贡献指南
 
-We welcome contributions! Please follow these steps:
+我们欢迎贡献！请按照以下步骤：
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. Fork 仓库
+2. 创建功能分支（`git checkout -b feature/amazing-feature`）
+3. 提交更改（`git commit -m 'Add amazing feature'`）
+4. 推送到分支（`git push origin feature/amazing-feature`）
+5. 打开 Pull Request
 
-### Development Environment Setup
+### 开发环境搭建
 
 ```bash
-# Clone your fork
+# 克隆你的 fork
 git clone https://github.com/x-kill9/xrpc-framework.git
 cd xrpc-framework
 
-# Install dependencies
+# 安装依赖
 mvn clean install
 
-# Run tests
+# 运行测试
 mvn test
 
-# Build project
+# 构建项目
 mvn clean package
 ```
 
-### Code Standards
+### 代码规范
 
-- Follow standard Java conventions
-- Use meaningful variable and method names
-- Add JavaDoc for public APIs
-- Write unit tests for new features
-- Maintain code coverage above 80%
+- 遵循标准 Java 约定
+- 使用有意义的变量和方法名
+- 为公共 API 添加 JavaDoc
+- 为新功能编写单元测试
+- 保持代码覆盖率在 80% 以上
 
-## 📄 License
+## 📄 许可证
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+本项目采用 Apache License 2.0 许可证 - 详见 [LICENSE](LICENSE) 文件。
 
-## 🙏 Acknowledgments
+## 🙏 致谢
 
-- Inspired by [Dubbo](https://github.com/apache/dubbo) and [gRPC](https://github.com/grpc/grpc-java)
-- Built with excellent open-source libraries from the Java ecosystem
-- Thanks to all contributors and users
+- 灵感来自 [Dubbo](https://github.com/apache/dubbo) 和 [gRPC](https://github.com/grpc/grpc-java)
+- 使用 Java 生态系统中优秀的开源库构建
+- 感谢所有贡献者和用户
 
-## 📞 Contact
+## 📞 联系方式
 
-- Project Link: [https://github.com/x-kill9/xrpc-framework](https://github.com/x-kill9/xrpc-framework)
-- Issue Tracking: [GitHub Issues](https://github.com/x-kill9/xrpc-framework/issues)
+- 项目链接：[https://github.com/x-kill9/xrpc-framework](https://github.com/x-kill9/xrpc-framework)
+- 问题反馈：[GitHub Issues](https://github.com/x-kill9/xrpc-framework/issues)
 
 ---
 
 <div align="center">
 
-**⭐ If you find this project helpful, please give it a Star! ⭐**
+**⭐ 如果觉得这个项目有帮助，请给个 Star！⭐**
 
 </div>
