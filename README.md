@@ -4,7 +4,7 @@
 [![Netty](https://img.shields.io/badge/Netty-4.1.117-blue)](https://netty.io/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-[English](README.md) | 中文 
+[English](README.en.md) | 中文 
 
 X-RPC 是一个高性能、轻量级的 RPC（远程过程调用）框架，基于 Netty 构建，专为微服务架构设计。提供服务注册与发现、负载均衡、限流、熔断等服务治理功能。
 
