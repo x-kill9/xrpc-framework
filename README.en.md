@@ -4,7 +4,7 @@
 [![Netty](https://img.shields.io/badge/Netty-4.1.117-blue)](https://netty.io/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-English | [中文](README.zh-CN.md)
+English | [中文](README.md)
 
 X-RPC is a high-performance, lightweight RPC (Remote Procedure Call) framework built on Netty, designed for microservices architecture. It provides service governance features including service registration and discovery, load balancing, rate limiting, circuit breaking, and more.
 
