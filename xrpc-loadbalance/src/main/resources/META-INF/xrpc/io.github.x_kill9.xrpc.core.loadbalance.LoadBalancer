@@ -1,0 +1,2 @@
+random=io.github.x_kill9.xrpc.loadbalance.RandomLoadBalancer
+round=io.github.x_kill9.xrpc.loadbalance.RoundRobinLoadBalancer

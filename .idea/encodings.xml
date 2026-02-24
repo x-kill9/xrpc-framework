@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/rpc-faulttolerance/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpc-faulttolerance/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-all/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-all/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-annotation/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-annotation/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-bom/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-bom/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-circuitbreaker/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-circuitbreaker/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-config/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-config/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-config/xrpc-config-yaml/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-config/xrpc-config-yaml/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-example/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-example/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-example/xrpc-example-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-example/xrpc-example-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-example/xrpc-example-consumer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-example/xrpc-example-consumer/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-example/xrpc-example-provider/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-example/xrpc-example-provider/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-loadbalance/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-loadbalance/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-logging/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-logging/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-netty/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-netty/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-ratelimiter/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-ratelimiter/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-registry/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-registry/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-registry/xrpc-registry-local/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-registry/xrpc-registry-local/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-registry/xrpc-registry-zookeeper/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-registry/xrpc-registry-zookeeper/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-serializer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xrpc-serializer/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

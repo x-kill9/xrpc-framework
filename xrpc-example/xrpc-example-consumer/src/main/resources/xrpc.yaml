@@ -1,0 +1,33 @@
+xrpc:
+  client:
+    serializer: kryo                     # Serialization method, supports kryo
+    loadBalancer: round                  # Load balancing strategy, supports round, random
+    connectTimeout: 3000                  # Connection timeout (ms)
+    callTimeout: 3000                     # Call timeout (ms)
+    heartbeatIntervalSeconds: 60           # Heartbeat interval (seconds) to keep long connections alive
+
+    interceptors:                         # Interceptor chain, executed in order
+      - name: trace                        # Logging trace interceptor
+        properties:
+          level: INFO                       # Log level: DEBUG/INFO/WARN/ERROR
+          logArgs: true                      # Whether to log method arguments
+          logResult: true                     # Whether to log the return result
+
+      - name: rateLimiter                    # Rate limiting interceptor
+        properties:
+          type: tokenBucket                   # Rate limiting algorithm: tokenBucket
+          params:
+            capacity: 200                       # Token bucket capacity, allows burst traffic
+            refillRate: 20                       # Tokens added per second, determines average rate
+
+      - name: circuitBreaker                  # Circuit breaker interceptor
+        properties:
+          type: slidingWindow                  # Circuit breaker algorithm: slidingWindow
+          params:
+            failureThreshold: 5                  # Failure count threshold within the sliding window
+            timeoutMs: 10000                      # Time to wait before transitioning from OPEN to HALF_OPEN (ms)
+            windowSize: 10000                     # Sliding window size (ms)
+
+  registry:
+    type: zookeeper                        # Registry type: zookeeper
+    address: 127.0.0.1:2181                 # Registry address

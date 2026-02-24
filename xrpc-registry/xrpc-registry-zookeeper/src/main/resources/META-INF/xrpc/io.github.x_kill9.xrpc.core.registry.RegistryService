@@ -1,0 +1,1 @@
+zookeeper=io.github.x_kill9.xrpc.zookeeper.registry.ZookeeperRegistryService

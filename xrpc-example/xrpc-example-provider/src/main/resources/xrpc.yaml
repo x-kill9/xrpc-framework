@@ -1,0 +1,6 @@
+xrpc:
+  server:
+    port: 8080                      # 服务端口
+  registry:
+    type: zookeeper                 # 注册中心类型
+    address: 127.0.0.1:2181         # 注册中心地址
